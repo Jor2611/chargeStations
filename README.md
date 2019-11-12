@@ -58,7 +58,7 @@ And ready to go!!!
 
 By default companies.json and stations.json have data structured like in image below.
 
-![Diagram](https://github.com/Jor2611/chargeStations/Diagram.jpg)
+![Diagram](https://raw.githubusercontent.com/Jor2611/chargeStations/master/Diagram.jpg)
 
 Companies with even numbers have 3 stations and with odd numbers 4 stations for each one.
 In the place of station coordinates, I used the coordinates of the capital cities to make easy to test coordination endpoints.
