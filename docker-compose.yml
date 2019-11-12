@@ -1,0 +1,15 @@
+version: "3"
+services:
+  node:
+    image: jorakhachatryan/charge-station
+    container_name: charge-station-node
+    restart: always
+    ports:
+      - "80:3000"
+    links:
+      - db
+  db:
+    container_name: db
+    image: mongo
+    ports:
+      - "27017:27017"
