@@ -1,15 +1,28 @@
 version: "3"
 services:
   node:
-    image: jorakhachatryan/charge-station
+    # image: jorakhachatryan/charge-stations
     container_name: charge-station-node
     restart: always
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./config:/usr/src/app/config
+    build: .
     ports:
       - "80:3000"
-    links:
+    depends_on:
       - db
+    networks:
+      - charge-stations-network
+
   db:
     container_name: db
     image: mongo
     ports:
       - "27017:27017"
+    networks:
+      - charge-stations-network
+
+networks:
+  charge-stations-network:
+    driver: bridge

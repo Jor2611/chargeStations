@@ -1,60 +1,65 @@
 const { company } = require("../providers");
 const middleware = require("./middleware/middleware");
 const router = require("express").Router();
+const {
+  SERVER_ERROR,
+  COMPANY_NOT_FOUND
+} = require("../utils/response_constants");
 
-router.get("/company", middleware, async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-    res.send(req.company);
-  } catch (e) {}
-});
-
-router.get("/companies", async (req, res) => {
-  try {
-    const doc = await company.find();
-    return doc
-      ? res.status(200).send(doc)
-      : res.status(404).send("Cannot find companies");
+    const doc = await company.get();
+    return res.status(doc.statusCode).send(doc);
   } catch (e) {
-    return res.status(500).send("Cannot get companies");
+    return res.status(SERVER_ERROR.statusCode).send(SERVER_ERROR);
   }
 });
 
-router.post("/company", async (req, res) => {
+router.get("/:companyId", middleware, async (req, res) => {
+  try {
+    return res
+      .status(200)
+      .send({ success: true, statusCode: 200, data: req.company });
+  } catch (e) {
+    return res.status(SERVER_ERROR.statusCode).send(SERVER_ERROR);
+  }
+});
+
+router.get("/:companyId/childCompanies", async (req, res) => {
+  try {
+    const doc = await company.getChildCompanies(req.params.companyId);
+    return res.status(doc.statusCode).send(doc);
+  } catch (e) {
+    return res.status(SERVER_ERROR.statusCode).send(SERVER_ERROR);
+  }
+});
+
+router.post("/", async (req, res) => {
   try {
     const doc = await company.create(req.body);
-    return doc.success
-      ? res.status(doc.statusCode).send(doc.data)
-      : res.status(doc.statusCode).send(doc.msg);
+    return res.status(doc.statusCode).send(doc);
   } catch (e) {
-    return res.status(500).end();
+    return res.status(SERVER_ERROR.statusCode).send(SERVER_ERROR);
   }
 });
 
-router.delete("/company", middleware, async (req, res) => {
+router.delete("/:companyId", middleware, async (req, res) => {
   try {
-    await req.company.remove();
-    return res.status(200).send(`Company ${req.company.name} removed.`);
+    let doc = await company.remove(req.company);
+    return res.status(doc.statusCode).send(doc);
   } catch (e) {
-    return res.status(500).end();
+    return res.status(SERVER_ERROR.statusCode).send(SERVER_ERROR);
   }
 });
 
-router.patch("/company/own/", middleware, async (req, res) => {
-  const { companyIdNeedOwn } = req.body;
-  if (req.company._id === companyIdNeedOwn.toUpperCase())
-    return res.status(400).send("Company cannot be owned by itself!");
+router.patch("/:companyId/own/", middleware, async (req, res) => {
   try {
-    const doc = await company.own(
-      req.company._id,
-      companyIdNeedOwn.toUpperCase()
-    );
-    return doc.success
-      ? res
-          .status(doc.statusCode)
-          .send(`${companyIdNeedOwn} owned successfully!`)
-      : res.status(doc.statusCode).send(doc.msg);
+    const doc = await company.own(req.company._id, req.body.companyIdNeedOwn);
+    return res.status(doc.statusCode).send(doc);
   } catch (e) {
-    return res.status(500).end();
+    if (e.name === "TypeError")
+      return res.status(COMPANY_NOT_FOUND.statusCode).send(COMPANY_NOT_FOUND);
+    return res.status(SERVER_ERROR.statusCode).send(SERVER_ERROR);
   }
 });
 

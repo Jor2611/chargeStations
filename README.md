@@ -19,7 +19,7 @@ PORT=[PORT NUMBER]
 MONGODB_URL=[mongodb://HOST:DB_PORT/DB]
 ```
 
-### (Optional)
+### Run On Local Environment
 
 Add Companies and Stations collections to db
 to make testing easy.
@@ -40,11 +40,21 @@ For testing.
 npm run test
 ```
 
-### OR
+### Run with docker compose
 
-##### 2)
+Clone repository.
 
-If you have docker and docker compose, just copy docker-compose.yml file and run docker compose.
+```sh
+$ git clone
+$ cd chargeStation
+```
+
+Setup dev.nev and test.env in config folder like in example below.
+
+```sh
+PORT=[PORT NUMBER]
+MONGODB_URL=[mongodb://HOST:DB_PORT/DB]
+```
 
 ```sh
 $ docker-compose up
@@ -58,7 +68,7 @@ And ready to go!!!
 
 By default companies.json and stations.json have data structured like in image below.
 
-![Diagram](https://raw.githubusercontent.com/Jor2611/chargeStations/master/Diagram.jpg)
+![Diagram](https://bitbucket.org/z-khachatryan/chargestations/raw/cfc509897cf14898c77f89e6dc10e081ef60fe20/Diagram.jpg)
 
 Companies with even numbers have 3 stations and with odd numbers 4 stations for each one.
 In the place of station coordinates, I used the coordinates of the capital cities to make easy to test coordination endpoints.
@@ -73,13 +83,19 @@ Here is endpoints to use`
 Get specific company.
 
 ```sh
-/company?companyId=[company_id]
+/company/[companyId]
 ```
 
 Get all companies.
 
 ```sh
-/companies
+/company
+```
+
+Get child companies.
+
+```sh
+/company/[companyId]/childCompanies
 ```
 
 #### Create Company [POST]
@@ -99,7 +115,7 @@ Request body.
 #### Own Company [PATCH]
 
 ```sh
-/company/own?companyId=[Owner_company_id]
+/company/[companyId]/own
 ```
 
 Request body.
@@ -113,19 +129,19 @@ Request body.
 #### Delete Company [DELETE]
 
 ```sh
-/company/companyId=[company_id]
+/company/[companyId]
 ```
 
 #### Get Stations [GET]
 
 ```sh
-/stations
+/station
 ```
 
 Set companyId query string with specific company ObjectId to get stations hierarchically.
 
 ```sh
-/stations?companyId=[owner_company_id]
+/station?companyId=[owner_company_id]
 ```
 
 Set station ObjectId to get specific station.
@@ -137,7 +153,7 @@ Set station ObjectId to get specific station.
 #### Create Station [POST]
 
 ```sh
-/station?companyId=[owner_company_id]
+/station/[companyId]
 ```
 
 Request body.
@@ -175,5 +191,5 @@ Request body.
 #### Find Stations in Radius [GET]
 
 ```sh
-/stationsInRadius?radius=[radius_in_kilometers]&lat=[latitude]&long=[longitude]
+/station/stationsInRadius?radius=[radius_in_kilometers]&lat=[latitude]&long=[longitude]
 ```

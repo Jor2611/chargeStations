@@ -35,16 +35,18 @@ companySchema.pre("remove", async function(next) {
 companySchema.pre("updateOne", async function(next) {
   const company = await this.model.findOne(this.getQuery());
   const childId = mongoose.Types.ObjectId(this._update["$push"].children);
+  const childCompany = await this.model.findOne({ _id: childId });
+
+  if (!childCompany) throw new Error("Company Not Found");
 
   if (company.children.includes(childId))
-    throw new Error(`<${childId}> Already Owned By This Company!`);
+    throw new Error("Already Owned By This Company!");
 
   const isCompanyHasOwner = await Company.find({
     children: { $in: [childId] }
   });
 
-  if (isCompanyHasOwner.length > 0)
-    throw new Error(`Company Owned by <${isCompanyHasOwner[0].name}>`);
+  if (isCompanyHasOwner.length > 0) throw new Error("Company Owned by");
 
   next();
 });

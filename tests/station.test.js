@@ -15,29 +15,29 @@ beforeEach(configureDatabase);
 
 test("Should Create Station", async () => {
   const response = await request(app)
-    .post(`/station?companyId=${companyOneId}`)
+    .post(`/station/${companyOneId}`)
     .send({ name: "Station 1", latitude: 45.452155, longitude: 24.216466 })
     .expect(201);
-  expect(response.body).toMatchObject({ name: "Station 1" });
+  expect(response.body.data).toMatchObject({ name: "Station 1" });
 });
 
 test("Should Not Create Station, With Invalid Company", async () => {
   await request(app)
-    .post(`/station?companyId=fakiId`)
+    .post(`/station/fakiId`)
     .send({ name: "Station 1", latitude: 45.452155, longitude: 24.216466 })
     .expect(404);
 });
 
 test("Should Not Create Station, With Invalid Coordinates", async () => {
   await request(app)
-    .post(`/station?companyId=${companyOneId}`)
+    .post(`/station/${companyOneId}`)
     .send({ name: "Station 1", latitude: "fake", longitude: "fake" })
     .expect(400);
 });
 
 test("Should Not Create Station, With Invalid Credentials", async () => {
   await request(app)
-    .post(`/station?companyId=${companyOneId}`)
+    .post(`/station/${companyOneId}`)
     .send({ name: "", latitude: "", longitude: "" })
     .expect(400);
 });
@@ -46,7 +46,7 @@ test("Should Get Station", async () => {
   const response = await request(app)
     .get(`/station/${stationOneId}`)
     .expect(200);
-  expect(response.body).toMatchObject({ name: "Station 1 Yerevan" });
+  expect(response.body.data).toMatchObject({ name: "Station 1 Yerevan" });
 });
 
 test("Should Not Get Station, With Invalid Station Id", async () => {
@@ -57,46 +57,48 @@ test("Should Not Get Station, With Invalid Station Id", async () => {
 
 test("Should Not Get Stations Of Company Hierarchically, With Invalid Company Id", async () => {
   const response = await request(app)
-    .get(`/stations?companyId=fake`)
-    .expect(400);
+    .get(`/station?companyId=fake`)
+    .expect(404);
 });
 
 test("Should Get Stations Of Company Hierarchically", async () => {
   const firstResponse = await request(app)
-    .patch(`/company/own?companyId=${companyOneId}`)
+    .patch(`/company/${companyOneId}/own`)
     .send({ companyIdNeedOwn: companyTwoId })
     .expect(200);
   const secondResponse = await request(app)
-    .get(`/stations?companyId=${companyOneId}`)
+    .get(`/station?companyId=${companyOneId}`)
     .expect(200);
-  expect(secondResponse.body.length).toBe(3);
+  expect(secondResponse.body.data.length).toBe(3);
 });
 
 test("Should Get All Stations", async () => {
   const response = await request(app)
-    .get(`/stations`)
+    .get(`/station`)
     .expect(200);
-  expect(response.body.length).toBe(3);
+  expect(response.body.data.length).toBe(3);
 });
 
 test("Should Not Get All Stations", async () => {
   const response = await request(app)
-    .get(`/stations`)
+    .get(`/station`)
     .expect(200);
-  expect(response.body.length).not.toBe(2);
+  expect(response.body.data.length).not.toBe(2);
 });
 
 test("Should Get Point In Radius ", async () => {
   const { latitude, longitude } = stationOne;
   const response = await request(app)
-    .get(`/stationsInRadius?radius=1000&long=${longitude}&lat=${latitude}`)
+    .get(
+      `/station/stationsInRadius?radius=1000&long=${longitude}&lat=${latitude}`
+    )
     .expect(200);
-  expect(response.body.length).toBe(2);
+  expect(response.body.data.length).toBe(2);
 });
 
 test("Should Not Get Point In Radius, With Invalid Coordinates", async () => {
   await request(app)
-    .get(`/stationsInRadius?radius=1000&long=fake&lat=fake`)
+    .get(`/station/stationsInRadius?radius=1000&long=fake&lat=fake`)
     .expect(400);
 });
 
@@ -120,7 +122,7 @@ test("Should Delete Station", async () => {
 test("Should Not Delete Station, With Invalid Station Id", async () => {
   await request(app)
     .delete(`/station/fake`)
-    .expect(500);
+    .expect(404);
   const stations = await Station.find();
   expect(stations.length).toBe(3);
 });
