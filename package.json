@@ -21,7 +21,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "geolib": "^3.0.4",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "mongoose": "^5.7.7",
     "mongoose-double": "0.0.1",
     "uuid": "^3.3.3",
