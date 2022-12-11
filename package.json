@@ -19,7 +19,7 @@
   "author": "Zhora Khachatryan",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "geolib": "^3.0.4",
     "lodash": "^4.17.15",
     "mongoose": "^5.7.7",
